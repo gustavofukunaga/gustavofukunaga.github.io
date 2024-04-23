@@ -56,20 +56,20 @@ footer_entries:
 
 misc_entries:
   - title: this is an example vertical list
-    url: false
+    url: true
 
   - title: you can show or hide using a boolean flag in _config.yml
-    url: false
+    url: true
 
   - title: and you can add data in _data/home.yml
-    url: false
+    url: true
 
   - title: Blog posts
     post_list: true
-    url: false
+    url: true
 
   - title: moonwalk on the Internet
-    url: false
+    url: true
     entries:
       - title: on Github
         url: https://github.com/abhinavs/moonwalk
@@ -78,12 +78,12 @@ misc_entries:
         url: https://www.abhinav.co
 
       - title: this list is scalable and can be nested
-        url: false
+        url: true
         entries:
           - title: this is nested inside a nested list
-            url: false
+            url: true
 
           - title: it is easy to use, see _data/home.yml to see how to configure it.
-            url: false
+            url: true
 
 
