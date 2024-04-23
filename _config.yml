@@ -2,8 +2,7 @@ title: Gustavo Fukunaga
 author: Gustavo Fukunaga
 url: https://gustavofukunaga.github.io/ # root address of the site
 description: > # description of the site (multiple lines allowed)
-  This is my personal tech blog, where I post reports of my experiences learning software engineering related stuff
-
+  This blog is dedicated to my personal exploration of software engineering, where I share insights and experiences acquired through my learning journey.
 permalink: /:slug
 
 favicon: "./logo.png" # relative path to site's favicon
