@@ -1,6 +1,6 @@
 ---
 title: "Contributing to kworkflow"
-date: 2024-04-23
+date: 2024-05-19
 ---
 
 In this blog post, I will talk about the process of contributing to kworkflow, an open source project providing Linux kernel development tools, reducing the environment and setup overhead of developing for the Linux kernel.
