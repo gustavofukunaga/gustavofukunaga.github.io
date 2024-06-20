@@ -1,0 +1,131 @@
+---
+title: "My second contribution to kworkflow"
+date: 2024-06-18
+---
+
+In this blog post I will talk about my second contribution to kworkflow, an open source project providing Linux kernel development tools, reducing the environment and setup overhead of developing for the Linux kernel.
+
+- kworkflow repository: [https://github.com/kworkflow/kworkflow](https://github.com/kworkflow/kworkflow)
+
+- kworkflow documentation: [https://kworkflow.org/](https://kworkflow.org/)
+
+## The issue
+
+`kw codestyle` is a wrapper for the script checkpatch of the Linux Kernel, it helps developers follow the code style adopted by the project checking for issues in a file or patch. The goal of `kw codestyle` is to simplify the use of checkpatch.
+
+The command works as:
+
+```
+    kw (c | codestyle)
+    kw (c | codestyle) [<directory> | <file> | <patch>]
+    kw (c | codestyle) [--verbose] [<directory> | <file> | <patch>]
+
+    OPTIONS
+       <directory>, <file>, <patch>:
+              Define which files to run checkpatch on. Defaults to current working directory if it is a kernel tree.
+
+       --verbose:
+              Display commands executed under the hood.
+```
+
+In issue [#162](https://github.com/kworkflow/kworkflow/issues/162), two new features to `kw codestyle` are requested, an option to check code style only in an specified function, and an option to check code style only in a line interval of a file. Me and and [Caio Dantas](https://github.com/Caio-Dantas) decided to work on it.
+
+## Initial planning
+
+Our first plan was to split the work in two:
+
+First, the option to check code style in a line interval, to achieve this, we'd have to create two new options for `kw codestyle`:
+
+- `--start-line`: representing the start of the line interval.
+- `--end-line`: representing the end of the line interval.
+
+Also, it would be nice if this feature worked without one of the options:
+
+```bash
+# Check code style in the interval starting at line 10 until line 30 of <file>
+kw codestyle --start-line 10 --end-line 30 <file>
+
+# Check code style in the interval starting at line 10 until the end of <file>
+kw codestyle --start-line 10 <file>
+
+# Check code style in the interval starting at the start of file until line 30 of <file>
+kw codestyle --end-line 30 <file>
+```
+
+Our idea to approach this feature was to use something like `sed --quiet '10,30p' <file>` that prints the interval of a file from line 10 to line 30, and store this in a temporary file to run checkpatch. This approach was similar to what we thought to the second part of the issue.
+
+The second part was to check code style in a function to achieve this, we'd have to create a new option for `kw codestyle`:
+
+- `--function`: to receive the name of the function.
+
+Would work as:
+
+```bash
+# Check code style in the <function_name> inside of <file>
+kw codestyle --function <function_name> <file>
+```
+
+The plan for this feature was also to store the function definition in a temporary file to run checkpatch. However the difference was in how we would find the line interval where the function is defined, at the time we didn't know exactly how to do this, but we knew we'd use a command to search for a regex.
+
+We also decided that it made sense that both of this features would only be supported when `kw codestyle` is executed on a single file.
+
+## Development issues
+
+Most of the development was done in the file `src/codestyle.sh`, which is the `kw codestyle` file, after understanding how to receive parameters from the user, implementing what we had planned was not that hard. But when we finished, we discovered two issues:
+
+The default output of `kw codestyle` shows the path of the file being checked and if there are any error or warnings, it shows the line where it happened. The default output, using no options, is something like:
+
+```bash
+Running checkpatch.pl on: /path/file.c
+=========================================================
+/path/file.c:82: ERROR: open brace '{' following enum go on the same line
+/path/file.c:164: WARNING: Missing a blank line after declarations
+```
+
+But when we'd run tests using the options `kw codestyle --start-line 80 --end-line 100 /path/file.c` our output would be:
+
+```bash
+Running checkpatch.pl on: /path/file.c
+=========================================================
+/path/file.c:1: WARNING: Missing or malformed SPDX-License-Identifier tag in line 1
+/path/file.c:3: ERROR: open brace '{' following enum go on the same line
+```
+
+Notice that the output is not what we expected to be, running the command in from line 80 to line 100, should detect only the error `/path/file.c:82: ERROR: open brace '{' following enum go on the same line` of the default output, but our output had two issues:
+
+- A new warning was introduced to the output.
+- The line of the error was supposed to be 82, but was 3 in our tests.
+
+First let's talk about the line number error, this was caused because to create the temporary file where the checkpatch was executed, we'd extract the line interval of the original file using the command `sed -n "${start_line},${end_line}p" "$file"` and send the output to the temporary file, in this case, the start line of the interval would be the first line in the temporary file, in our example, the 80th line of the original file turned into the first line of the temporary file, in the same way the 82th line of the original file where the error was located, turned into the third line of the temporary file.
+
+To understand the other issue we had, it's important to understand the meaning of the warning. In our tests this warning would be introduced every time the start line was greater than 1, that's because it is a warning informing the absense or malformation of the SPDX-License-Identifier in the first line, it is a header identifying the type of the SPDX license used for the file, the identifier itself is a standardized abbreviation for a common open source software license. The header looks like:
+
+```c
+// SPDX-License-Identifier: GPL-2.0-only
+```
+
+The solution for our tests issues were simple, first, for all cases that `--start-line` was greater than 1, we had to add a SPDX-License-Identifier to our temporary file, in this way the warning would not show anymore, also we found out that checkpatch doesn't check if the SPDX-License-Identifier is a valid one, so we could use a header like:
+
+```c
+// SPDX-License-Identifier: <any string>
+```
+
+Then to solve the issue with line numbers, for all cases that `--start-line` was greater than 1, after adding the SPDX-License-Identifier to the temporary file, in order to the `--start-line` not be the first line in the temporary file, we added blank lines before adding the content of the line interval in the temporary file, so if `--start-line` was equal to n, we would add `n - 2` blank lines before the content of the interval.
+
+After all the fixes our test outputs was:
+
+```bash
+>kw codestyle --start-line 80 --end-line 100 /path/file.c
+Running checkpatch.pl on: /path/file.c
+=========================================================
+/path/file.c:82: ERROR: open brace '{' following enum go on the same line
+```
+
+The output only shows the error in line 82, exactly what we were expecting!
+
+### Development issues for function option
+
+## Next steps
+### Improvements
+### Documentation
+## Conclusion
