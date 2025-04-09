@@ -1,6 +1,6 @@
 ---
 layout: home
-title: MAC0499 - Trabalho de Formatura Supervisionado
+title: Proposta de Trabalho
 ---
 
 - Orientador: Ricardo Nakamura
