@@ -10,8 +10,6 @@ title: Proposta de Trabalho
 
 [Game Design Document (GDD)](/gdd)
 
-# Proposta de Trabalho
-
 ## Introdução
 
 O tema é a criação de um jogo que busca unir elementos de 2 gêneros: jogos auto battler e jogos roguelike. 

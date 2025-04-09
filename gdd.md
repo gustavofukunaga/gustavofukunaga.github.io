@@ -3,8 +3,6 @@ layout: page
 title: Game Design Document
 ---
 
-# Game Design Document
-
 ## Visão Geral
 - Gênero: Auto Battler + Roguelike
 - Inspirações: Teamfight Tactics (TFT), Balatro, Slay the Spire
