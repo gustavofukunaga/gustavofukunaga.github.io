@@ -8,8 +8,8 @@ title: Proposta de Trabalho
 - NUSP: 11207651
 - Email: gustavofukunaga@usp.br
 
-[Game Design Document (GDD)](/gdd)
-[Game](/game)
+- [Game Design Document (GDD)](/gdd)
+- [Game](https://gustavofukunaga.itch.io/rogue-auto-battler?secret=vFk17aikGMI2Lq7OdFabZG13hwc)
 
 ## Introdução
 
