@@ -9,6 +9,7 @@ title: Proposta de Trabalho
 - Email: gustavofukunaga@usp.br
 
 [Game Design Document (GDD)](/gdd)
+[Game](/game)
 
 ## Introdução
 
