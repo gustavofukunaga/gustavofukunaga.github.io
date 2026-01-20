@@ -7,10 +7,12 @@ title: Proposta de Trabalho
 - Nome: Gustavo Ueti Fukunaga
 - NUSP: 11207651
 - Email: gustavofukunaga@usp.br
+- Título: Desenvolvimento de um Jogo Auto Battler com Elementos de Roguelike
 
 - [Game Design Document (GDD)](/gdd)
 - [Game](https://gustavofukunaga.itch.io/rogue-auto-battler?secret=vFk17aikGMI2Lq7OdFabZG13hwc)
 - [Monografia](monografiaTCC.pdf)
+- [Poster](poster.pdf)
 
 ## Introdução
 
